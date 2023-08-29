@@ -43,40 +43,85 @@ const createEvent = async(req, res = express.response) => {
   }
 }
 
-const updateEvent = (req, res = express.response) => {
+const updateEvent = async(req, res = express.response) => {
 
+  const eventId = req.params.id
+  const uid = req.uid
+  
   try {
-    
+
+    const event = await Event.findById(eventId)
+
+    if(!event) {
+      return res.status(404).json({
+      ok: false,
+      msg: 'Event doesn\'t exist.'
+    })}
+
+    if (event.user.toString() !== uid){
+      return res.status(401).json({
+        ok: false,
+        msg: 'No privilegies for edit this event.'
+      })
+    }
+
+    const newEvent = {
+      ...req.body,
+      user: uid
+    }
+    const updateEvent = await Event.findByIdAndUpdate(eventId, newEvent, { new: true })
+
+    return res.json({
+      ok: true,
+      event: updateEvent
+    })
+
   } catch (error) {
     console.error(error)
     return res.status(500).json({
       ok: false,
-      msg: 'Error server'
+      msg: 'Error. Contact with the admin.'
     })
   }
 
-  return res.json({
-    ok: true,
-    msg: 'updateEvent'
-  })
 }
 
-const deleteEvent = (req, res = express.response) => {
+const deleteEvent = async(req, res = express.response) => {
 
+  const eventId = req.params.id
+  const uid = req.uid
+  
   try {
-    
+
+    const event = await Event.findById(eventId)
+
+    if(!event) {
+      return res.status(404).json({
+      ok: false,
+      msg: 'Event doesn\'t exist.'
+    })}
+
+    if (event.user.toString() !== uid){
+      return res.status(401).json({
+        ok: false,
+        msg: 'No privilegies for delete this event.'
+      })
+    }
+
+    const deleteEvent = await Event.findByIdAndDelete(eventId)
+
+    return res.json({
+      ok: true,
+      event: deleteEvent
+    })
+
   } catch (error) {
     console.error(error)
     return res.status(500).json({
       ok: false,
-      msg: 'Error server'
+      msg: 'Error. Contact with the admin.'
     })
   }
-
-  return res.json({
-    ok: true,
-    msg: 'deleteEvent'
-  })
 }
 
 module.exports = {
