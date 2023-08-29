@@ -1,9 +1,16 @@
 const express = require('express')
+const Event = require('../models/Event')
 
-const getEvents = (req, res = express.response) => {
+const getEvents = async(req, res = express.response) => {
 
   try {
-    console.log('success')
+    const events = await Event.find().populate('user', 'name')
+
+
+    res.json({
+      ok: true,
+      events
+    })
   } catch (error) {
     console.error(error)
     return res.status(500).json({
@@ -12,28 +19,28 @@ const getEvents = (req, res = express.response) => {
     })
   }
 
-  return res.json({
-    ok: true,
-    msg: 'getEvents'
-  })
 }
 
-const createEvent = (req, res = express.response) => {
+const createEvent = async(req, res = express.response) => {
+
+  const event = new Event(req.body)
 
   try {
-    console.log(req.body)
+
+    event.user = req.uid
+    const eventSaved = await event.save()
+
+    res.json({
+      ok: true,
+      event: eventSaved
+    })
   } catch (error) {
     console.error(error)
-    return res.status(500).json({
+    res.status(500).json({
       ok: false,
-      msg: 'Error server'
+      msg: 'Error. Contact with the admin.'
     })
   }
-
-  return res.json({
-    ok: true,
-    msg: 'createEvent'
-  })
 }
 
 const updateEvent = (req, res = express.response) => {
