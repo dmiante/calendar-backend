@@ -91,13 +91,14 @@ const loginUser = async(req, res = express.response) => {
 
 const renewToken = async(req, res = express.response) => {
 
-  const uid = req.uid
-  const name = req.name
+  const { uid, name } = req
 
   const token = await setJWT(uid, name)
 
   res.json({
     ok: true,
+    uid,
+    name,
     token
   })
 }
