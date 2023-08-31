@@ -3,7 +3,6 @@ const { dbConnection } = require('./db/config')
 const cors = require('cors')
 require('dotenv').config()
 
-console.log('connect watch')
 // create server express
 const app = express()
 const PORT = process.env.PORT
